@@ -1,0 +1,58 @@
+version: '3'
+
+services:
+
+  app-acc:
+    image: 'keysafe-backend-app:latest'
+#    build:
+#      context: ../src
+    container_name: keysafe-backend-app-acc
+    depends_on:
+      - db-acc
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db-acc:5432/keysafe-acc
+      - SPRING_DATASOURCE_USERNAME=keysafe-acc
+      - SPRING_DATASOURCE_PASSWORD=keysafe-acc
+      - SPRING_PROFILES_ACTIVE=prod
+      - BASIC_AUTH_USERNAME=keysafe-acc
+      - BASIC_AUTH_PASSWORD={noop}keysafe-acc
+    networks:
+      - keysafe-acc
+
+  db-acc:
+    container_name: keysafe-postgres-database-acc
+    image: postgres:13
+    ports:
+      - "6002:5432"
+    environment:
+      POSTGRES_DB: keysafe-acc
+      POSTGRES_USER: keysafe-acc
+      POSTGRES_PASSWORD: keysafe-acc
+    networks:
+      - keysafe-acc
+    volumes:
+      - ../src/integration/src/main/resources/schema.sql:/docker-entrypoint-initdb.d/init.sql
+#    healthcheck:
+#      test: ["CMD-SHELL", "pg_isready -U postgres"]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
+
+  acc-tests:
+    image: 'keysafe-backend-app-acc-tests:latest'
+    build:
+      context: .
+    container_name: keysafe-acc-tests-py
+    environment:
+      - BASE_BACKEND_URL=http://app-acc:8080
+      - BASIC_AUTH_USERNAME=keysafe-acc
+      - BASIC_AUTH_PASSWORD=keysafe-acc
+    depends_on:
+      - db-acc
+      - app-acc
+    networks:
+      - keysafe-acc
+
+networks:
+  keysafe-acc:
+    driver: bridge

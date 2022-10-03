@@ -1,0 +1,14 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+'autonumber
+
+Device -> BackupServer: signup
+BackupServer --> Device: keysafe-id
+
+Device -> BackupServer: createProfile(keysafe-id, {profile-data} )
+BackupServer --> Device: { profile_id }
+
+Device -> BackupServer: updateProfile(keysafe-id, profile-id, {profile-data} )
+BackupServer --> Device: { ok }
+@enduml

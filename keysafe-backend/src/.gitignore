@@ -1,0 +1,12 @@
+*/target/
+/.settings/
+*.classpath
+.project
+*.prefs
+mvn_clean_install_copy.bat
+*.iml
+.idea/
+.git/
+.DS_Store
+.env
+logs
